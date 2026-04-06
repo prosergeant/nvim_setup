@@ -24,21 +24,28 @@ vim.g.mapleader = " "
 require("lazy").setup({
 
   -- Тема
-  { "catppuccin/nvim", name = "catppuccin", priority = 1000,
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
     config = function()
       require("catppuccin").setup({ flavour = "mocha" })
       vim.cmd.colorscheme("catppuccin-mocha")
-    end },
+    end
+  },
 
   -- Файловое дерево
-  { "nvim-tree/nvim-tree.lua",
+  {
+    "nvim-tree/nvim-tree.lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("nvim-tree").setup()
-    end },
+    end
+  },
 
   -- Fuzzy finder
-  { "nvim-telescope/telescope.nvim",
+  {
+    "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       require("telescope").setup({
@@ -55,10 +62,12 @@ require("lazy").setup({
           }
         }
       })
-    end },
+    end
+  },
 
   -- Treesitter
-  { "nvim-treesitter/nvim-treesitter",
+  {
+    "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     main = "nvim-treesitter",
     opts = {
@@ -66,33 +75,39 @@ require("lazy").setup({
       auto_install = true,
       highlight = { enable = true },
       indent = { enable = true },
-    } },
+    }
+  },
 
   -- Mason
-  { "williamboman/mason.nvim",
+  {
+    "williamboman/mason.nvim",
     config = function()
       require("mason").setup()
-    end },
+    end
+  },
 
-  { "williamboman/mason-lspconfig.nvim",
+  {
+    "williamboman/mason-lspconfig.nvim",
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = { "lua_ls", "pyright", "ts_ls" }, -- , "vue_ls"
         automatic_installation = true,
       })
-    end },
+    end
+  },
 
   -- LSP (новый API)
-  { "neovim/nvim-lspconfig",
+  {
+    "neovim/nvim-lspconfig",
     dependencies = { "williamboman/mason-lspconfig.nvim", "hrsh7th/cmp-nvim-lsp" },
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      vim.lsp.config("lua_ls",  { capabilities = capabilities })
+      vim.lsp.config("lua_ls", { capabilities = capabilities })
       vim.lsp.config("pyright", { capabilities = capabilities })
-      vim.lsp.config("ts_ls",   { 
+      vim.lsp.config("ts_ls", {
         capabilities = capabilities,
-        filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" , "vue"},
+        filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
         init_options = {
           plugins = {
             {
@@ -111,11 +126,13 @@ require("lazy").setup({
           },
         })
       })
-      vim.lsp.enable({ "lua_ls", "pyright", "ts_ls", "vue_ls" }) 
-    end },
+      vim.lsp.enable({ "lua_ls", "pyright", "ts_ls", "vue_ls" })
+    end
+  },
 
   -- Автодополнение
-  { "hrsh7th/nvim-cmp",
+  {
+    "hrsh7th/nvim-cmp",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
@@ -134,14 +151,22 @@ require("lazy").setup({
           ["<C-Space>"] = cmp.mapping.complete(),
           ["<CR>"]      = cmp.mapping.confirm({ select = true }),
           ["<Tab>"]     = cmp.mapping(function(fallback)
-            if cmp.visible() then cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then luasnip.expand_or_jump()
-            else fallback() end
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
           end, { "i", "s" }),
           ["<S-Tab>"]   = cmp.mapping(function(fallback)
-            if cmp.visible() then cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then luasnip.jump(-1)
-            else fallback() end
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
           end, { "i", "s" }),
         }),
         sources = cmp.config.sources({
@@ -151,30 +176,60 @@ require("lazy").setup({
           { name = "path" },
         }),
       })
-    end },
+    end
+  },
 
   -- Statusline
-  { "nvim-lualine/lualine.nvim",
+  {
+    "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("lualine").setup({ options = { theme = "catppuccin" } })
-    end },
+    end
+  },
 
   -- Автозакрытие скобок
-  { "windwp/nvim-autopairs",
+  {
+    "windwp/nvim-autopairs",
     event = "InsertEnter",
     config = function()
       require("nvim-autopairs").setup()
-    end },
+    end
+  },
 
   -- Комментарии (gcc / gc)
-  { "numToStr/Comment.nvim",
+  {
+    "numToStr/Comment.nvim",
+    dependencies = {
+      -- Этот плагин научит Comment.nvim понимать контекст внутри Vue/JSX
+      "JoosepAlviste/nvim-ts-context-commentstring",
+    },
     config = function()
-      require("Comment").setup()
-    end },
+      -- 1. Сначала настраиваем контекстный плагин
+      require('ts_context_commentstring').setup({
+        enable_autocmd = false,
+      })
+
+      -- 2. Затем настраиваем сам Comment.nvim с хуком
+      require("Comment").setup({
+        -- Используем ваши новые клавиши (из предыдущего шага)
+        toggler = {
+          line = '<leader>cl',
+          block = '<leader>cb',
+        },
+        opleader = {
+          line = '<leader>c',
+          block = '<leader>b',
+        },
+        -- ГЛАВНОЕ: этот хук определяет тип комментария перед нажатием клавиш
+        pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
+      })
+    end,
+  },
 
   -- Форматирование (Prettier и др.)
-  { "stevearc/conform.nvim",
+  {
+    "stevearc/conform.nvim",
     config = function()
       require("conform").setup({
         formatters_by_ft = {
@@ -197,7 +252,8 @@ require("lazy").setup({
           },
         },
       })
-    end },
+    end
+  },
 
   -- Git
   { "tpope/vim-fugitive" },
@@ -215,40 +271,39 @@ require("lazy").setup({
   --     port = 21036,
   --   })
   -- end},
-
 })
 
 -- Кеймапы
 local map = vim.keymap.set
 
-map("n", "<leader>e",  ":NvimTreeToggle<CR>",       { desc = "File tree" })
+map("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "File tree" })
 map("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find files" })
-map("n", "<leader>fg", ":Telescope live_grep<CR>",  { desc = "Live grep" })
-map("n", "<leader>fb", ":Telescope buffers<CR>",    { desc = "Buffers" })
-map("n", "<leader>fh", ":Telescope help_tags<CR>",  { desc = "Help" })
+map("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Live grep" })
+map("n", "<leader>fb", ":Telescope buffers<CR>", { desc = "Buffers" })
+map("n", "<leader>fh", ":Telescope help_tags<CR>", { desc = "Help" })
 
-map("n", "gd",         vim.lsp.buf.definition,      { desc = "Go to definition" })
-map("n", "gr",         vim.lsp.buf.references,      { desc = "References" })
-map("n", "K",          vim.lsp.buf.hover,           { desc = "Hover docs" })
-map("n", "<leader>rn", vim.lsp.buf.rename,          { desc = "Rename" })
-map("n", "<leader>ca", vim.lsp.buf.code_action,     { desc = "Code action" })
-map("n", "[d",         vim.diagnostic.goto_prev,    { desc = "Prev diagnostic" })
-map("n", "]d",         vim.diagnostic.goto_next,    { desc = "Next diagnostic" })
-map("n", "<leader>d",  vim.diagnostic.open_float,   { desc = "Diagnostic float" })
+map("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
+map("n", "gr", vim.lsp.buf.references, { desc = "References" })
+map("n", "K", vim.lsp.buf.hover, { desc = "Hover docs" })
+map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })
+map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+map("n", "<leader>d", vim.diagnostic.open_float, { desc = "Diagnostic float" })
 map({ "n", "v" }, "<leader>p", function()
   require("conform").format({ async = true, lsp_fallback = true })
 end, { desc = "Format (Prettier)" })
 
 -- Git keymaps
-map("n", "<leader>gs", ":Git<CR>", { desc = "Git status"})
-map("n", "<leader>gss", ":Telescope git_status<CR>", { desc = "Git status (Telescope)"})
-map("n", "<leader>gp", ":Git push<CR>", { desc = "Git push"})
-map("n", "<leader>gl", ":Git log<CR>", { desc = "Git log"})
-map("n", "<leader>gd", ":Git diff<CR>", { desc = "Git diff"})
+map("n", "<leader>gs", ":Git<CR>", { desc = "Git status" })
+map("n", "<leader>gss", ":Telescope git_status<CR>", { desc = "Git status (Telescope)" })
+map("n", "<leader>gp", ":Git push<CR>", { desc = "Git push" })
+map("n", "<leader>gl", ":Git log<CR>", { desc = "Git log" })
+map("n", "<leader>gd", ":Git diff<CR>", { desc = "Git diff" })
 -- map("n", "<leader>gb", ":Git branch<CR>", { desc = "Git branch"})
-map("n", "<leader>gb", ":Telescope git_branches<CR>", { desc = "Git branches"})
-map("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit"})
-map("n", "<leader>gsc", ":Telescope git_commits<CR>", { desc = "Git commits (Telescope)"})
+map("n", "<leader>gb", ":Telescope git_branches<CR>", { desc = "Git branches" })
+map("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit" })
+map("n", "<leader>gsc", ":Telescope git_commits<CR>", { desc = "Git commits (Telescope)" })
 
 map("n", "<leader>gcc", function()
   local branch = vim.fn.input("Checkout branch: ")
@@ -256,7 +311,7 @@ map("n", "<leader>gcc", function()
     vim.cmd("Git checkout " .. branch)
     vim.cmd("Git pull")
   end
-end, { desc = "Git checkout + pull"})
+end, { desc = "Git checkout + pull" })
 
 map("n", "<leader>gcb", function()
   local new_branch = vim.fn.input("New branch name: ")
@@ -266,7 +321,7 @@ map("n", "<leader>gcb", function()
   vim.cmd("Git checkout " .. from_branch)
   vim.cmd("Git pull")
   vim.cmd("Git checkout -b " .. new_branch)
-end, { desc = "Git new branch"})
+end, { desc = "Git new branch" })
 
 -- GitLab keymap
 -- map("n", "<leader>mrl", ":lua require('gitlab').list_mrs()<CR>", { desc = "List Mrs"})
