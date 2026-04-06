@@ -25,12 +25,11 @@ require("lazy").setup({
 
   -- Тема
   {
-    "catppuccin/nvim",
-    name = "catppuccin",
+    "folke/tokyonight.nvim",
     priority = 1000,
     config = function()
-      require("catppuccin").setup({ flavour = "mocha" })
-      vim.cmd.colorscheme("catppuccin-mocha")
+      require("tokyonight").setup({})
+      vim.cmd.colorscheme("tokyonight")
     end
   },
 
