@@ -71,7 +71,7 @@ require("lazy").setup({
     build = ":TSUpdate",
     main = "nvim-treesitter",
     opts = {
-      ensure_installed = { "lua", "python", "javascript", "typescript", "rust", "bash" },
+      ensure_installed = { "lua", "python", "javascript", "typescript", "rust", "bash", "vue" },
       auto_install = true,
       highlight = { enable = true },
       indent = { enable = true },
@@ -197,34 +197,11 @@ require("lazy").setup({
     end
   },
 
-  -- Комментарии (gcc / gc)
+  -- Нативное комментирование (gc / gcc) + поддержка JSX/TSX
   {
-    "numToStr/Comment.nvim",
-    dependencies = {
-      -- Этот плагин научит Comment.nvim понимать контекст внутри Vue/JSX
-      "JoosepAlviste/nvim-ts-context-commentstring",
-    },
-    config = function()
-      -- 1. Сначала настраиваем контекстный плагин
-      require('ts_context_commentstring').setup({
-        enable_autocmd = false,
-      })
-
-      -- 2. Затем настраиваем сам Comment.nvim с хуком
-      require("Comment").setup({
-        -- Используем ваши новые клавиши (из предыдущего шага)
-        toggler = {
-          line = '<leader>cl',
-          block = '<leader>cb',
-        },
-        opleader = {
-          line = '<leader>c',
-          block = '<leader>b',
-        },
-        -- ГЛАВНОЕ: этот хук определяет тип комментария перед нажатием клавиш
-        pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
-      })
-    end,
+    "folke/ts-comments.nvim",
+    opts = {},
+    event = "VeryLazy",
   },
 
   -- Форматирование (Prettier и др.)
@@ -271,6 +248,29 @@ require("lazy").setup({
   --     port = 21036,
   --   })
   -- end},
+})
+
+-- Vue: динамический commentstring по секции (template/script/style)
+-- Нужен потому что treesitter не парсит vue буфер без активного хайлайтера,
+-- и нативный gcc фоллбэчит на vim.bo.commentstring.
+vim.api.nvim_create_autocmd({ "BufEnter", "CursorMoved", "CursorMovedI" }, {
+  pattern = "*.vue",
+  callback = function()
+    local lnum = vim.fn.line(".")
+    for i = lnum, 1, -1 do
+      local line = vim.fn.getline(i)
+      if line:match("^<script") then
+        vim.bo.commentstring = "// %s"
+        return
+      elseif line:match("^<style") then
+        vim.bo.commentstring = "/* %s */"
+        return
+      elseif line:match("^<template") then
+        break
+      end
+    end
+    vim.bo.commentstring = "<!-- %s -->"
+  end,
 })
 
 -- Кеймапы
