@@ -272,6 +272,9 @@ vim.api.nvim_create_autocmd({ "BufEnter", "CursorMoved", "CursorMovedI" }, {
   end,
 })
 
+-- настройки телескопа
+require('my_telescope').setup()
+
 -- Кеймапы
 local map = vim.keymap.set
 
@@ -280,6 +283,7 @@ map("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find files" })
 map("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Live grep" })
 map("n", "<leader>fb", ":Telescope buffers<CR>", { desc = "Buffers" })
 map("n", "<leader>fh", ":Telescope help_tags<CR>", { desc = "Help" })
+map('i', 'jj', '<Esc>', { noremap = true, silent = true }) -- Выход из режима вставки через jj
 
 map("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
 map("n", "gr", vim.lsp.buf.references, { desc = "References" })
@@ -296,7 +300,7 @@ end, { desc = "Format (Prettier)" })
 -- Git keymaps
 map("n", "<leader>gs", ":Git<CR>", { desc = "Git status" })
 map("n", "<leader>gss", ":Telescope git_status<CR>", { desc = "Git status (Telescope)" })
-map("n", "<leader>gp", ":Git push<CR>", { desc = "Git push" })
+map("n", "<leader>gp", ":Git push -u origin HEAD<CR>", { desc = "Git push" })
 map("n", "<leader>gl", ":Git log<CR>", { desc = "Git log" })
 map("n", "<leader>gd", ":Git diff<CR>", { desc = "Git diff" })
 -- map("n", "<leader>gb", ":Git branch<CR>", { desc = "Git branch"})
