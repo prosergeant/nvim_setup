@@ -321,10 +321,26 @@ map("n", "<leader>gcb", function()
   if new_branch == "" then return end
   local from_branch = vim.fn.input("From branch (default: dev): ")
   if from_branch == "" then from_branch = "dev" end
+
   vim.cmd("Git checkout " .. from_branch)
   vim.cmd("Git pull")
+
+  -- Проверяем существует ли ветка
+  local branch_exists = vim.fn.system("git branch --list " .. new_branch)
+  branch_exists = branch_exists:gsub("%s+", "")
+
+  if branch_exists ~= "" then
+    local confirm = vim.fn.input("Branch '" .. new_branch .. "' already exists. Overwrite? (y/N): ")
+    if confirm:lower() ~= "y" then
+      print("\nAborted.")
+      return
+    end
+    vim.cmd("Git branch -D " .. new_branch)
+  end
+
   vim.cmd("Git checkout -b " .. new_branch)
 end, { desc = "Git new branch" })
+
 
 -- GitLab keymap
 -- map("n", "<leader>mrl", ":lua require('gitlab').list_mrs()<CR>", { desc = "List Mrs"})
