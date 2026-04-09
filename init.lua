@@ -341,6 +341,22 @@ map("n", "<leader>gcb", function()
   vim.cmd("Git checkout -b " .. new_branch)
 end, { desc = "Git new branch" })
 
+-- посмотреть разницу между текущем файлом и таким же файлом на другой ветке
+map("n", "<leader>gdf", function()
+  local branch = vim.fn.input("Compare with branch (default: pp): ")
+  if branch == "" then branch = "pp" end
+  local file = vim.fn.expand("%") -- текущий файл относительно корня проекта
+  vim.cmd("Gvdiffsplit " .. branch .. ":" .. file)
+end, { desc = "Git diff current file with branch" })
+
+-- забрать текущий файл целиком с другой ветки
+map("n", "<leader>gdo", function()
+  local branch = vim.fn.input("Get file from branch (default: pp): ")
+  if branch == "" then branch = "pp" end
+  local file = vim.fn.expand("%")
+  vim.cmd("!git checkout " .. branch .. " -- " .. file)
+  vim.cmd("edit!") -- перечитать файл
+end, { desc = "Git checkout file from branch" })
 
 -- GitLab keymap
 -- map("n", "<leader>mrl", ":lua require('gitlab').list_mrs()<CR>", { desc = "List Mrs"})
