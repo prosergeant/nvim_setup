@@ -136,7 +136,13 @@ require("lazy").setup({
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "L3MON4D3/LuaSnip",
+      {
+        "L3MON4D3/LuaSnip",
+        dependencies = { "rafamadriz/friendly-snippets" },
+        config = function()
+          require("luasnip.loaders.from_vscode").lazy_load()
+        end
+      },
       "saadparwaiz1/cmp_luasnip",
     },
     config = function()
@@ -308,6 +314,7 @@ map("n", "<leader>gb", ":Telescope git_branches<CR>", { desc = "Git branches" })
 map("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit" })
 map("n", "<leader>gsc", ":Telescope git_commits<CR>", { desc = "Git commits (Telescope)" })
 
+-- Переключиться на ветку и обновить ее
 map("n", "<leader>gcc", function()
   local branch = vim.fn.input("Checkout branch: ")
   if branch ~= "" then
@@ -316,6 +323,7 @@ map("n", "<leader>gcc", function()
   end
 end, { desc = "Git checkout + pull" })
 
+-- Создать новую ветку от выбранной но перед этим ее обновить
 map("n", "<leader>gcb", function()
   local new_branch = vim.fn.input("New branch name: ")
   if new_branch == "" then return end
@@ -340,6 +348,29 @@ map("n", "<leader>gcb", function()
 
   vim.cmd("Git checkout -b " .. new_branch)
 end, { desc = "Git new branch" })
+
+vim.keymap.set("n", "<leader>gU", function()
+  local branch = vim.fn.system("git branch --format='%(refname:short)' | grep -v '^*'"):gsub("\n$", "")
+
+  local branches = {}
+  for b in branch:gmatch("[^\n]+") do
+    table.insert(branches, b)
+  end
+
+  vim.ui.select(branches, {
+    prompt = "Update branch (fast-forward):",
+  }, function(selected)
+    if not selected then return end
+
+    local result = vim.fn.system("git fetch origin " .. selected .. ":" .. selected .. " 2>&1")
+    local ok = vim.v.shell_error == 0
+
+    vim.notify(
+      ok and ("✓ Updated: " .. selected) or ("✗ Failed:\n" .. result),
+      ok and vim.log.levels.INFO or vim.log.levels.ERROR
+    )
+  end)
+end, { desc = "Git: update branch without switching" })
 
 -- посмотреть разницу между текущем файлом и таким же файлом на другой ветке
 map("n", "<leader>gdf", function()
