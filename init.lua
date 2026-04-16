@@ -349,6 +349,7 @@ map("n", "<leader>gcb", function()
   vim.cmd("Git checkout -b " .. new_branch)
 end, { desc = "Git new branch" })
 
+-- обновить ветку не переключаясь
 vim.keymap.set("n", "<leader>gU", function()
   local branch = vim.fn.system("git branch --format='%(refname:short)' | grep -v '^*'"):gsub("\n$", "")
 
@@ -388,6 +389,10 @@ map("n", "<leader>gdo", function()
   vim.cmd("!git checkout " .. branch .. " -- " .. file)
   vim.cmd("edit!") -- перечитать файл
 end, { desc = "Git checkout file from branch" })
+
+-- работа с табами
+map("n", "<leader>tn", ":tabnew<CR>", { desc = "New tab" })
+map("n", "<leader>tc", ":tabclose<CR>", { desc = "Close tab" })
 
 -- GitLab keymap
 -- map("n", "<leader>mrl", ":lua require('gitlab').list_mrs()<CR>", { desc = "List Mrs"})
