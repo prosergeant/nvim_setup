@@ -313,6 +313,7 @@ map("n", "<leader>gd", ":Git diff<CR>", { desc = "Git diff" })
 map("n", "<leader>gb", ":Telescope git_branches<CR>", { desc = "Git branches" })
 map("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit" })
 map("n", "<leader>gsc", ":Telescope git_commits<CR>", { desc = "Git commits (Telescope)" })
+map("n", "<leader>gB", ":Git blame<CR>", { desc = "Git blame" })
 
 -- Переключиться на ветку и обновить ее
 map("n", "<leader>gcc", function()
@@ -394,5 +395,7 @@ end, { desc = "Git checkout file from branch" })
 map("n", "<leader>tn", ":tabnew<CR>", { desc = "New tab" })
 map("n", "<leader>tc", ":tabclose<CR>", { desc = "Close tab" })
 
+map("n", "]<Space>", "o<Esc>", { desc = "New line below" })
+map("n", "[<Space>", "O<Esc>", { desc = "New line above" })
 -- GitLab keymap
 -- map("n", "<leader>mrl", ":lua require('gitlab').list_mrs()<CR>", { desc = "List Mrs"})
