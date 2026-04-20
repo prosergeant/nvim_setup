@@ -19,6 +19,11 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 50
 vim.g.mapleader = " "
+-- fold code blocks
+-- vim.opt.foldmethod = "expr"
+-- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+-- vim.opt.foldenable = false  -- не сворачивать всё при открытии файла
+-- vim.opt.foldlevel = 99      -- по умолчанию всё раскрыто
 
 -- Плагины
 require("lazy").setup({
@@ -395,7 +400,12 @@ end, { desc = "Git checkout file from branch" })
 map("n", "<leader>tn", ":tabnew<CR>", { desc = "New tab" })
 map("n", "<leader>tc", ":tabclose<CR>", { desc = "Close tab" })
 
+-- Добавить строку не переходя в режим insert 
 map("n", "]<Space>", "o<Esc>", { desc = "New line below" })
 map("n", "[<Space>", "O<Esc>", { desc = "New line above" })
+
+-- открыть файл в дереве файлов и папок
+map("n", "<leader>ef", ":NvimTreeFindFile<CR>", { desc = "Find current file in tree" })
+
 -- GitLab keymap
 -- map("n", "<leader>mrl", ":lua require('gitlab').list_mrs()<CR>", { desc = "List Mrs"})
